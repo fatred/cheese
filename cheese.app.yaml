@@ -1,0 +1,41 @@
+#@ load("@ytt:data", "data")
+
+#@ def gen_image(image, cheese):
+#@   return image + ":" + cheese
+#@ end
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: cheese
+
+#@ for/end cheese in data.values.cheeses:
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: #@ cheese.name
+  namespace: #@ data.values.namespace
+  labels:
+    app: cheese
+    cheese: #@ cheese.name
+spec:
+  replicas: #@ data.values.replicas
+  selector:
+    matchLabels:
+      app: cheese
+      task: #@ cheese.name
+  template:
+    metadata:
+      labels:
+        app: cheese
+        task: #@ cheese.name
+        version: #@ data.values.version
+    spec:
+      containers:
+      - name: cheese
+        image: #@ gen_image(data.values.base_image, cheese.name)
+        resources: #@ data.values.resources
+        ports:
+        - containerPort: #@ data.values.container_port
