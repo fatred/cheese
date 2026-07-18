@@ -3,7 +3,7 @@
 
 A simple example deployment for k8s. 
 
-Pre-req: Install the carver tools 
+Pre-req: Install the carvel tools (https://carvel.dev/ytt/docs/v0.52.x/install/)
 
 ---
 
