@@ -4,11 +4,25 @@
 #@   return image + ":" + cheese
 #@ end
 
+#@ def gen_httproute_path(cheese):
+#@   return "/" + cheese 
+#@ end
+
 ---
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: cheese
+  name: #@ data.values.namespace
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: #@ data.values.gateway.name
+  namespace: #@ data.values.namespace
+spec:
+  gatewayClassName: #@ data.values.gateway.className
+  listeners: #@ data.values.gateway.listeners
 
 #@ for/end cheese in data.values.cheeses:
 ---
@@ -39,3 +53,46 @@ spec:
         resources: #@ data.values.resources
         ports:
         - containerPort: #@ data.values.container_port
+
+#@ for/end cheese in data.values.cheeses:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: #@ cheese.name
+  namespace: #@ data.values.namespace
+spec:
+  ports:
+  - name: http
+    targetPort: #@ data.values.container_port
+    port: 80
+  selector:
+    app: cheese
+    task: #@ cheese.name
+
+#@ for/end cheese in data.values.cheeses:
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: #@ cheese.name
+  namespace: #@ data.values.namespace
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: cheese
+    namespace: #@ data.values.namespace
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: #@ gen_httproute_path(cheese.name)
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /
+  - backendRefs:
+    - name: #@ cheese.name
+      port: #@ data.values.container_port 

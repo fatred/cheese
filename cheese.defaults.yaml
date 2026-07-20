@@ -2,6 +2,16 @@
 ---
 namespace: cheese
 base_image: errm/cheese
+gateway:
+  className: cloud-provider-kind
+  name: cheese
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: cheese-http
+    allowedRoutes:
+      namespaces:
+        from: Same
 cheeses:
   - name: stilton
   - name: cheddar
