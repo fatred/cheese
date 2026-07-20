@@ -7,6 +7,12 @@ Pre-req: Install the carvel tools (https://carvel.dev/ytt/docs/v0.52.x/install/)
 
 check your defaults match. specifically, pick the right gateway class for your env (default is `cloud-provider-kind`, you might like to have `cilium`)
 
+read more about ytt here: https://carvel.dev/ytt/
+read more about kapp here: https://carvel.dev/kapp/ 
+read more about the cloud-provider-kind here: https://github.com/kubernetes-sigs/cloud-provider-kind?tab=readme-ov-file
+
+use helm instead of ytt in front of kapp: `kapp -y deploy -a my-chart -f <(helm template my-chart --values my-vals.yml)`
+
 ---
 
 ytt only: 
